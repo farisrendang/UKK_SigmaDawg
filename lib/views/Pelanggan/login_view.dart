@@ -42,24 +42,21 @@ class _LoginViewState extends State<LoginView> {
 
     if (result['success'] == true) {
       String role = result['role'];
-      
+
       if (role == 'admin' || role == 'petugas') {
         Navigator.pushReplacement(
-          context, 
-          MaterialPageRoute(builder: (c) => const AdminDashboardView())
+          context,
+          MaterialPageRoute(builder: (c) => const AdminDashboardView()),
         );
       } else {
         Navigator.pushReplacement(
-          context, 
-          MaterialPageRoute(builder: (c) => const HomeView())
+          context,
+          MaterialPageRoute(builder: (c) => const HomeView()),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result['message']),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(result['message']), backgroundColor: Colors.red),
       );
     }
   }
@@ -74,18 +71,30 @@ class _LoginViewState extends State<LoginView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Center(child: Icon(Icons.travel_explore, size: 80, color: Color(0xFFC2185B))),
+                const Center(
+                  child: Icon(
+                    Icons.travel_explore,
+                    size: 80,
+                    color: Color(0xFFC2185B),
+                  ),
+                ),
                 const SizedBox(height: 40),
-                const Text("Selamat Datang", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                const Text(
+                  "Selamat Datang",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
-                const Text("Log In untuk melanjutkan perjalananmu", style: TextStyle(fontSize: 14, color: Colors.grey)),
+                const Text(
+                  "Masuk untuk melanjutkan perjalananmu",
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
                 const SizedBox(height: 32),
-                
+
                 // Form Input
                 CustomTextField(
-                  label: "Username", 
-                  prefixIcon: Icons.person_outline, 
-                  controller: _usernameController
+                  label: "Username",
+                  prefixIcon: Icons.person_outline,
+                  controller: _usernameController,
                 ),
                 CustomTextField(
                   label: "Password",
@@ -93,11 +102,12 @@ class _LoginViewState extends State<LoginView> {
                   isPassword: true,
                   isObscure: _isObscure,
                   controller: _passwordController,
-                  onToggleVisibility: () => setState(() => _isObscure = !_isObscure),
+                  onToggleVisibility:
+                      () => setState(() => _isObscure = !_isObscure),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -105,22 +115,49 @@ class _LoginViewState extends State<LoginView> {
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFC2185B),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
-                    child: _isLoading 
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Log In", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    child:
+                        _isLoading
+                            ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                            : const Text(
+                              "MASUK",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Tidak punya akun? ", style: TextStyle(color: Colors.grey)),
+                    const Text(
+                      "Tidak punya akun? ",
+                      style: TextStyle(color: Colors.grey),
+                    ),
                     GestureDetector(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (c) => const RegisterView())),
-                      child: const Text("Sign Up", style: TextStyle(color: Color(0xFFC2185B), fontWeight: FontWeight.bold)),
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (c) => const RegisterView(),
+                            ),
+                          ),
+                      child: const Text(
+                        "Daftar Sekarang",
+                        style: TextStyle(
+                          color: Color(0xFFC2185B),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -136,7 +173,9 @@ class _LoginViewState extends State<LoginView> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const AdminLoginView()),
+                        MaterialPageRoute(
+                          builder: (context) => const AdminLoginView(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.admin_panel_settings_outlined),

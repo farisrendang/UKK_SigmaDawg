@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
+
 const String baseUrl = "https://micke.my.id/api/ukk";
 
 class AuthProvider with ChangeNotifier {
-  // Base URL API
-  static const String baseUrl = "https://micke.my.id/api/ukk";
+  // Base URL API (Redundant, removed duplicate constant)
+  // static const String baseUrl = "https://micke.my.id/api/ukk";
 
   bool _isLoading = false;
   UserModel? _currentUser;
@@ -91,9 +92,11 @@ class AuthProvider with ChangeNotifier {
         // Simpan sesi ke HP (SharedPreferences)
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('role', _currentUser!.role);
+        
+        // --- FIX HERE: Handle null values ---
+        await prefs.setString('role', _currentUser?.role ?? 'penumpang');
         // Simpan ID user untuk keperluan pengambilan data nanti
-        await prefs.setString('userId', _currentUser!.id); 
+        await prefs.setString('userId', _currentUser?.id ?? '0'); 
         
         _isLoading = false;
         notifyListeners();

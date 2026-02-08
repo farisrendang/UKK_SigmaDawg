@@ -17,7 +17,8 @@ class _RegisterViewState extends State<RegisterView> {
   // Controllers
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _namaPenumpangController = TextEditingController();
+  final TextEditingController _namaPenumpangController =
+      TextEditingController();
   final TextEditingController _nikController = TextEditingController();
   final TextEditingController _telpController = TextEditingController();
   final TextEditingController _alamatController = TextEditingController();
@@ -32,9 +33,17 @@ class _RegisterViewState extends State<RegisterView> {
     final alamat = _alamatController.text.trim();
 
     // 2. Validasi
-    if (username.isEmpty || password.isEmpty || nama.isEmpty || nik.isEmpty || telp.isEmpty || alamat.isEmpty) {
+    if (username.isEmpty ||
+        password.isEmpty ||
+        nama.isEmpty ||
+        nik.isEmpty ||
+        telp.isEmpty ||
+        alamat.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Mohon lengkapi semua data!"), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text("Mohon lengkapi semua data!"),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -59,9 +68,12 @@ class _RegisterViewState extends State<RegisterView> {
     if (result['success'] == true) {
       // SUKSES -> Tampilkan Pesan -> Kembali ke Login
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message']), backgroundColor: Colors.green),
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: Colors.green,
+        ),
       );
-      Navigator.pop(context); 
+      Navigator.pop(context);
     } else {
       // GAGAL
       ScaffoldMessenger.of(context).showSnackBar(
@@ -77,7 +89,13 @@ class _RegisterViewState extends State<RegisterView> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color:
+                Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -87,21 +105,53 @@ class _RegisterViewState extends State<RegisterView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Buat Akun Baru", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              const Text(
+                "Buat Akun Baru",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 8),
-              const Text("Lengkapi data diri", style: TextStyle(fontSize: 14, color: Colors.grey)),
+              const Text(
+                "Lengkapi data diri",
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
               const SizedBox(height: 32),
 
-              CustomTextField(label: "Username", prefixIcon: Icons.alternate_email, controller: _usernameController),
               CustomTextField(
-                label: "Password", prefixIcon: Icons.lock_outline, 
-                isPassword: true, isObscure: _isObscure, controller: _passwordController,
-                onToggleVisibility: () => setState(() => _isObscure = !_isObscure)
+                label: "Username",
+                prefixIcon: Icons.alternate_email,
+                controller: _usernameController,
               ),
-              CustomTextField(label: "Nama Penumpang", prefixIcon: Icons.person_outline, controller: _namaPenumpangController),
-              CustomTextField(label: "NIK", prefixIcon: Icons.credit_card, keyboardType: TextInputType.number, controller: _nikController),
-              CustomTextField(label: "Nomor Telepon", prefixIcon: Icons.phone_android, keyboardType: TextInputType.phone, controller: _telpController),
-              CustomTextField(label: "Alamat Lengkap", prefixIcon: Icons.home_outlined, controller: _alamatController),
+              CustomTextField(
+                label: "Password",
+                prefixIcon: Icons.lock_outline,
+                isPassword: true,
+                isObscure: _isObscure,
+                controller: _passwordController,
+                onToggleVisibility:
+                    () => setState(() => _isObscure = !_isObscure),
+              ),
+              CustomTextField(
+                label: "Nama Penumpang",
+                prefixIcon: Icons.person_outline,
+                controller: _namaPenumpangController,
+              ),
+              CustomTextField(
+                label: "NIK",
+                prefixIcon: Icons.credit_card,
+                keyboardType: TextInputType.number,
+                controller: _nikController,
+              ),
+              CustomTextField(
+                label: "Nomor Telepon",
+                prefixIcon: Icons.phone_android,
+                keyboardType: TextInputType.phone,
+                controller: _telpController,
+              ),
+              CustomTextField(
+                label: "Alamat Lengkap",
+                prefixIcon: Icons.home_outlined,
+                controller: _alamatController,
+              ),
 
               const SizedBox(height: 24),
 
@@ -112,11 +162,21 @@ class _RegisterViewState extends State<RegisterView> {
                   onPressed: _isLoading ? null : _handleRegister,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC2185B),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
-                  child: _isLoading 
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Daftar Sekarang", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  child:
+                      _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                            "DAFTAR SEKARANG",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                 ),
               ),
             ],

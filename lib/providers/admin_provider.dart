@@ -1,18 +1,32 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'auth_provider.dart';
+
+const String baseUrl = "https://micke.my.id/api/ukk";
 
 class AdminProvider with ChangeNotifier {
   bool _isLoading = false;
+
   List<dynamic> _listKereta = [];
+  List<dynamic> _listJadwal = [];
+
+  // --- ADDED: VARIABLES FOR BOOKING LOGIC ---
+  List<dynamic> _listGerbong = [];
+  List<dynamic> _listKursi = [];
 
   bool get isLoading => _isLoading;
   List<dynamic> get listKereta => _listKereta;
+  List<dynamic> get listJadwal => _listJadwal;
 
-  // --------------------------------------------------------
-  // 1. FETCH DATA (GET)
-  // --------------------------------------------------------
+  // --- ADDED: GETTERS FOR BOOKING LOGIC ---
+  List<dynamic> get listGerbong => _listGerbong;
+  List<dynamic> get listKursi => _listKursi;
+
+  // ===========================================================================
+  // BAGIAN 1: MANAJEMEN KERETA (CRUD)
+  // ===========================================================================
+
+  // 1. GET KERETA
   Future<void> getKereta() async {
     _isLoading = true;
     notifyListeners();
@@ -32,12 +46,14 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
-// ... imports ...
-
-  // 1. FETCH DATA (Sudah OK, tidak perlu ubah)
-
-  // 2. TAMBAH DATA (POST) - UPDATE PARAMETER
-  Future<bool> addKereta(String nama, String deskripsi, String kelas, String jumlahGerbong, String kuota) async {
+  // 2. ADD KERETA
+  Future<bool> addKereta(
+    String nama,
+    String deskripsi,
+    String kelas,
+    String jumlahGerbong,
+    String kuota,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/kereta.php'),
@@ -45,14 +61,14 @@ class AdminProvider with ChangeNotifier {
           'nama_kereta': nama,
           'deskripsi': deskripsi,
           'kelas': kelas,
-          'jumlah_gerbong': jumlahGerbong, // Parameter Baru
-          'kuota': kuota, // Parameter Baru
+          'jumlah_gerbong': jumlahGerbong,
+          'kuota': kuota,
         },
       );
-      
+
       final data = json.decode(response.body);
       if (data['status'] == 'success') {
-        await getKereta(); 
+        await getKereta();
         return true;
       }
       return false;
@@ -61,8 +77,14 @@ class AdminProvider with ChangeNotifier {
     }
   }
 
-  // 3. EDIT DATA (PUT) - UPDATE PARAMETER
-  Future<bool> updateKereta(String id, String nama, String deskripsi, String kelas, String jumlahGerbong) async {
+  // 3. UPDATE KERETA
+  Future<bool> updateKereta(
+    String id,
+    String nama,
+    String deskripsi,
+    String kelas,
+    String jumlahGerbong,
+  ) async {
     try {
       final response = await http.put(
         Uri.parse('$baseUrl/kereta.php?id=$id'),
@@ -71,7 +93,7 @@ class AdminProvider with ChangeNotifier {
           'nama_kereta': nama,
           'deskripsi': deskripsi,
           'kelas': kelas,
-          'jumlah_gerbong': jumlahGerbong, // Parameter Baru (Target Jumlah)
+          'jumlah_gerbong': jumlahGerbong,
         }),
       );
 
@@ -82,49 +104,56 @@ class AdminProvider with ChangeNotifier {
       }
       return false;
     } catch (e) {
-      print("Error Update: $e");
       return false;
     }
   }
 
-  // --------------------------------------------------------
-  // 4. HAPUS DATA (DELETE)
-  // --------------------------------------------------------
+  // 4. DELETE KERETA
   Future<String> deleteKereta(String id) async {
     try {
-      final response = await http.delete(Uri.parse('$baseUrl/kereta.php?id=$id'));
+      final response = await http.delete(
+        Uri.parse('$baseUrl/kereta.php?id=$id'),
+      );
       final data = json.decode(response.body);
 
       if (data['status'] == 'success') {
-        _listKereta.removeWhere((item) => item['id'] == id); // Hapus dari UI langsung biar cepat
+        _listKereta.removeWhere((item) => item['id'] == id);
         notifyListeners();
         return "success";
       } else {
-        return data['message']; // Kembalikan pesan error (misal: Foreign Key constraint)
+        return data['message'];
       }
     } catch (e) {
       return "Terjadi kesalahan koneksi";
     }
   }
 
-  // ... (kode kereta sebelumnya) ...
+  // ===========================================================================
+  // BAGIAN 2: MANAJEMEN JADWAL (CRUD)
+  // ===========================================================================
 
-  List<dynamic> _listJadwal = [];
-  List<dynamic> get listJadwal => _listJadwal;
-
-  // 1. GET JADWAL
+  // 1. GET JADWAL (ADMIN VERSION - NO PARAMS)
+  // Admin mengambil SEMUA jadwal
   Future<void> getJadwal() async {
     _isLoading = true;
     notifyListeners();
+
     try {
-      final response = await http.get(Uri.parse('$baseUrl/jadwal.php'));
+      // Panggil URL tanpa parameter search agar PHP mengembalikan semua data
+      final url = Uri.parse('$baseUrl/jadwal.php');
+      final response = await http.get(url);
       final data = json.decode(response.body);
+
       if (data['status'] == 'success') {
         _listJadwal = data['data'];
+      } else {
+        _listJadwal = [];
       }
     } catch (e) {
-      print("Error Get Jadwal: $e");
+      print("Error Get Jadwal Admin: $e");
+      _listJadwal = [];
     }
+
     _isLoading = false;
     notifyListeners();
   }
@@ -134,9 +163,10 @@ class AdminProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/jadwal.php'),
-        body: body, // Kita kirim map langsung biar ringkas
+        body: body,
       );
       final data = json.decode(response.body);
+
       if (data['status'] == 'success') {
         await getJadwal();
         return true;
@@ -156,6 +186,7 @@ class AdminProvider with ChangeNotifier {
         body: json.encode(body),
       );
       final data = json.decode(response.body);
+
       if (data['status'] == 'success') {
         await getJadwal();
         return true;
@@ -169,8 +200,11 @@ class AdminProvider with ChangeNotifier {
   // 4. DELETE JADWAL
   Future<String> deleteJadwal(String id) async {
     try {
-      final response = await http.delete(Uri.parse('$baseUrl/jadwal.php?id=$id'));
+      final response = await http.delete(
+        Uri.parse('$baseUrl/jadwal.php?id=$id'),
+      );
       final data = json.decode(response.body);
+
       if (data['status'] == 'success') {
         _listJadwal.removeWhere((item) => item['id'] == id);
         notifyListeners();
@@ -180,5 +214,53 @@ class AdminProvider with ChangeNotifier {
     } catch (e) {
       return "Error Koneksi";
     }
+  }
+
+  Future<void> getGerbongByKereta(String idKereta) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/gerbong.php?id_kereta=$idKereta'),
+      );
+      final data = json.decode(response.body);
+
+      if (data['status'] == 'success') {
+        _listGerbong = data['data'];
+      } else {
+        _listGerbong = [];
+      }
+    } catch (e) {
+      print("Error Get Gerbong: $e");
+      _listGerbong = [];
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> getKursiByGerbong(String idGerbong) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/kursi.php?id_gerbong=$idGerbong'),
+      );
+      final data = json.decode(response.body);
+
+      if (data['status'] == 'success') {
+        _listKursi = data['data'];
+      } else {
+        _listKursi = [];
+      }
+    } catch (e) {
+      print("Error Get Kursi: $e");
+      _listKursi = [];
+    }
+
+    _isLoading = false;
+    notifyListeners();
   }
 }

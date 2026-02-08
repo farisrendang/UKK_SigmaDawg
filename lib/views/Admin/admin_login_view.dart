@@ -22,7 +22,10 @@ class _AdminLoginViewState extends State<AdminLoginView> {
 
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Username dan Password wajib diisi!"), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text("Username dan Password wajib diisi!"),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -41,12 +44,18 @@ class _AdminLoginViewState extends State<AdminLoginView> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Akses Ditolak! Bukan akun Petugas."), backgroundColor: Colors.orange),
+          const SnackBar(
+            content: Text("Akses Ditolak! Bukan akun Petugas."),
+            backgroundColor: Colors.orange,
+          ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Login Gagal! Periksa Username/Password."), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text("Login Gagal! Periksa Username/Password."),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -77,13 +86,17 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                   color: const Color(0xFFC2185B).withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.admin_panel_settings, size: 60, color: Color(0xFFC2185B)),
+                child: const Icon(
+                  Icons.admin_panel_settings,
+                  size: 60,
+                  color: Color(0xFFC2185B),
+                ),
               ),
               const SizedBox(height: 24),
-              
+
               const Text(
                 "Login Petugas",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFFC2185B)),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -106,7 +119,8 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                 isPassword: true,
                 isObscure: _isObscure,
                 controller: _passwordController,
-                onToggleVisibility: () => setState(() => _isObscure = !_isObscure),
+                onToggleVisibility:
+                    () => setState(() => _isObscure = !_isObscure),
               ),
 
               const SizedBox(height: 32),
@@ -119,16 +133,23 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                   onPressed: isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC2185B),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     elevation: 5,
                     shadowColor: const Color(0xFFC2185B).withOpacity(0.4),
                   ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          "MASUK",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                            "MASUK",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                 ),
               ),
             ],
