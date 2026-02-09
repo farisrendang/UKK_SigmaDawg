@@ -22,7 +22,7 @@ class _HomeViewState extends State<HomeView> {
 
   // Variable to store search results
   List<Map<String, dynamic>> _filteredSchedules = [];
-  bool _hasSearched = false; // To track if user has pressed search
+  bool _hasSearched = false;
 
   final List<String> _stations = [
     "Gambir",
@@ -32,13 +32,15 @@ class _HomeViewState extends State<HomeView> {
     "Yogyakarta",
     "Solo Balapan",
     "Semarang Tawang",
+    "Jakarta",
+    "Cirebon",
+    "Purwokerto",
   ];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Fetch all data initially
       Provider.of<AdminProvider>(context, listen: false).getJadwal();
     });
   }
@@ -50,13 +52,13 @@ class _HomeViewState extends State<HomeView> {
       String temp = _stasiunAsal;
       _stasiunAsal = _stasiunTujuan;
       _stasiunTujuan = temp;
-      _hasSearched = false; // Reset search state on change
+      _hasSearched = false;
     });
   }
 
   Future<void> _pickDate() async {
     DateTime now = DateTime.now();
-    DateTime maxDate = now.add(const Duration(days: 6));
+    DateTime maxDate = now.add(const Duration(days: 100));
 
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -75,7 +77,7 @@ class _HomeViewState extends State<HomeView> {
     if (picked != null) {
       setState(() {
         _tanggalBerangkat = picked;
-        _hasSearched = false; // Reset search state on change
+        _hasSearched = false; 
       });
     }
   }
@@ -149,13 +151,12 @@ class _HomeViewState extends State<HomeView> {
     ).format(int.parse(harga.toString()));
   }
 
-  // --- FILTER LOGIC ---
-  // --- FILTER LOGIC (UPDATED) ---
+
   void _performSearch(List<dynamic> allSchedules) {
     setState(() {
       _hasSearched = true;
 
-      // 1. Format the Date to YYYY-MM-DD
+
       String selectedDateStr = DateFormat(
         'yyyy-MM-dd',
       ).format(_tanggalBerangkat);
@@ -166,7 +167,6 @@ class _HomeViewState extends State<HomeView> {
       _filteredSchedules =
           allSchedules
               .where((schedule) {
-                // 2. Get Data from Database safely
                 String dbAsal =
                     (schedule['asal_keberangkatan'] ?? '').toString();
                 String dbTujuan =
@@ -175,7 +175,6 @@ class _HomeViewState extends State<HomeView> {
                 // Take only the first part of date (2026-02-09)
                 String dbDate = dbDateFull.split(' ')[0];
 
-                // 3. Robust Comparison (Ignore Case & Spaces)
                 bool matchAsal =
                     dbAsal.toLowerCase().trim() ==
                     _stasiunAsal.toLowerCase().trim();
@@ -184,10 +183,6 @@ class _HomeViewState extends State<HomeView> {
                     _stasiunTujuan.toLowerCase().trim();
                 bool matchTanggal = dbDate == selectedDateStr;
 
-                // Debugging: Print why a schedule was rejected (Optional)
-                // if (matchAsal && matchTujuan && !matchTanggal) {
-                //   print("Found Route but Wrong Date: DB has $dbDate");
-                // }
 
                 return matchAsal && matchTujuan && matchTanggal;
               })
@@ -204,8 +199,6 @@ class _HomeViewState extends State<HomeView> {
     final user = Provider.of<AuthProvider>(context).currentUser;
     const Color primaryColor = Color(0xFFC2185B);
 
-    // Determine which list to display
-    // If searched, use filtered list. If not, use full list from provider.
     final displayList =
         _hasSearched ? _filteredSchedules : adminProvider.listJadwal;
 
@@ -216,7 +209,7 @@ class _HomeViewState extends State<HomeView> {
           children: [
             Stack(
               children: [
-                // 1. HEADER GRADIENT
+                // HEADER GRADIENT
                 Container(
                   height: 280,
                   width: double.infinity,
@@ -289,7 +282,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
 
-                // 2. FLOATING SEARCH CARD
+                // FLOATING SEARCH CARD
                 Container(
                   margin: const EdgeInsets.fromLTRB(20, 120, 20, 20),
                   decoration: BoxDecoration(
@@ -308,7 +301,7 @@ class _HomeViewState extends State<HomeView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // --- ROW STASIUN ---
+                        // ROW STASIUN 
                         Row(
                           children: [
                             Expanded(
@@ -399,7 +392,7 @@ class _HomeViewState extends State<HomeView> {
                         const Divider(),
                         const SizedBox(height: 15),
 
-                        // --- ROW TANGGAL ---
+                        // ROW TANGGAL 
                         InkWell(
                           onTap: _pickDate,
                           child: SizedBox(
@@ -440,7 +433,7 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         const SizedBox(height: 25),
 
-                        // --- TOMBOL CARI (WITH FILTER LOGIC) ---
+                        // TOMBOL CARI 
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -483,7 +476,7 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
 
-            // 3. HASIL PENCARIAN (LIST JADWAL)
+            // HASIL PENCARIAN (LIST JADWAL)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(

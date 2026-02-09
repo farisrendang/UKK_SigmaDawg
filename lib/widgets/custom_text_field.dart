@@ -7,7 +7,7 @@ class CustomTextField extends StatelessWidget {
   final bool isObscure;
   final VoidCallback? onToggleVisibility;
   final TextInputType keyboardType;
-  final TextEditingController? controller; // Wajib ada
+  final TextEditingController? controller; 
 
   const CustomTextField({
     super.key,

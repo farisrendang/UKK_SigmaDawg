@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ukk_percobaan2/services/auth_service.dart';
+import 'package:provider/provider.dart'; 
+import 'package:ukk_percobaan2/providers/auth_provider.dart'; 
 import 'package:ukk_percobaan2/views/Admin/admin_dashboard_view.dart';
 import 'package:ukk_percobaan2/views/Admin/admin_login_view.dart';
 import 'package:ukk_percobaan2/widgets/custom_text_field.dart';
@@ -19,7 +20,7 @@ class _LoginViewState extends State<LoginView> {
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final AuthService _authService = AuthService();
+  
 
   void _handleLogin() async {
     final username = _usernameController.text.trim();
@@ -33,15 +34,17 @@ class _LoginViewState extends State<LoginView> {
     }
 
     setState(() => _isLoading = true);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    final result = await _authService.login(username, password);
+    final bool success = await authProvider.login(username, password);
 
     if (!mounted) return;
 
     setState(() => _isLoading = false);
 
-    if (result['success'] == true) {
-      String role = result['role'];
+    if (success) {
+      final user = authProvider.currentUser;
+      String role = user?.role ?? 'penumpang';
 
       if (role == 'admin' || role == 'petugas') {
         Navigator.pushReplacement(
@@ -56,7 +59,7 @@ class _LoginViewState extends State<LoginView> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message']), backgroundColor: Colors.red),
+        const SnackBar(content: Text("Login Gagal. Periksa username/password."), backgroundColor: Colors.red),
       );
     }
   }
@@ -112,26 +115,23 @@ class _LoginViewState extends State<LoginView> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleLogin,
+                    onPressed: _isLoading ? null : _handleLogin, // Calls our fixed function
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFC2185B),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child:
-                        _isLoading
-                            ? const CircularProgressIndicator(
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            "MASUK",
+                            style: TextStyle(
                               color: Colors.white,
-                            )
-                            : const Text(
-                              "MASUK",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
+                          ),
                   ),
                 ),
 
@@ -144,13 +144,10 @@ class _LoginViewState extends State<LoginView> {
                       style: TextStyle(color: Colors.grey),
                     ),
                     GestureDetector(
-                      onTap:
-                          () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (c) => const RegisterView(),
-                            ),
-                          ),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (c) => const RegisterView()),
+                      ),
                       child: const Text(
                         "Daftar Sekarang",
                         style: TextStyle(
@@ -166,7 +163,6 @@ class _LoginViewState extends State<LoginView> {
                 const Divider(),
                 const SizedBox(height: 20),
 
-                // --- TOMBOL KHUSUS ADMIN (DIKEMBALIKAN DI SINI) ---
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(

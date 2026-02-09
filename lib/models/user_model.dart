@@ -1,54 +1,43 @@
 class UserModel {
-  final String? id;          // User ID (from users table)
-  final String? username;
-  final String? role;
-  final String? namaLengkap;
-  final String? nik;
-  final String? telp;
-  final String? idPelanggan; // <-- THIS WAS MISSING
+  int? id;
+  String? username;
+  String? role;
+  int? idPelanggan;
+  String? nik;
+  String? namaLengkap;
+  String? telp;
 
   UserModel({
-    this.id,
-    this.username,
-    this.role,
-    this.namaLengkap,
-    this.nik,
-    this.telp,
+    this.id, 
+    this.username, 
+    this.role, 
     this.idPelanggan,
+    this.nik,
+    this.namaLengkap,
+    this.telp,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    // 1. Check if data is nested inside 'profile' (Common in your API logs)
-    final profile = json['profile'] ?? {};
+    // 1. Determine if data is inside 'profile' or at root
+    // If json has 'profile', use it. Otherwise, use json itself as the source for details.
+    Map<String, dynamic> details = (json['profile'] != null && json['profile'] is Map) 
+        ? json['profile'] 
+        : json;
 
     return UserModel(
-      // Map basic user fields
-      id: json['user_id']?.toString() ?? json['id']?.toString(),
-      username: json['username'],
-      role: json['role'],
+      // ID handling: Check user_id, then id
+      id: int.tryParse(json['user_id']?.toString() ?? json['id']?.toString() ?? '0'),
+      username: json['username']?.toString() ?? '-',
+      role: json['role']?.toString() ?? 'penumpang',
       
-      // Map Profile fields (Handle both root and nested structure)
-      namaLengkap: profile['nama_penumpang'] ?? profile['nama_petugas'] ?? json['nama_penumpang'] ?? json['nama'],
-      nik: profile['nik']?.toString() ?? json['nik']?.toString(),
-      telp: profile['telp'] ?? json['telp'],
+      // 2. CRITICAL: Look for data in the 'details' map we defined above
+      idPelanggan: int.tryParse(details['id']?.toString() ?? json['id_pelanggan']?.toString() ?? '0'),
       
-      // --- CRITICAL FIX: Map idPelanggan ---
-      // Usually 'id' inside the 'profile' object, or 'id_pelanggan' in root
-      idPelanggan: profile['id']?.toString() ?? json['id_pelanggan']?.toString(), 
+      // This handles both "nama_penumpang" (Database) and "nama" (Generic)
+      namaLengkap: details['nama_penumpang'] ?? details['nama'] ?? json['nama_penumpang'] ?? "Pengguna",
+      
+      nik: details['nik']?.toString() ?? '-',
+      telp: details['telp']?.toString() ?? '-',
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'user_id': id,
-      'username': username,
-      'role': role,
-      'profile': {
-        'id': idPelanggan,
-        'nama_penumpang': namaLengkap,
-        'nik': nik,
-        'telp': telp,
-      }
-    };
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
-import 'crud_template_view.dart'; // Ensure this file exists in your project
+import 'crud_template_view.dart';
 
 class UniversalCrudView extends StatefulWidget {
   const UniversalCrudView({super.key});
@@ -14,7 +14,6 @@ class _UniversalCrudViewState extends State<UniversalCrudView> {
   @override
   void initState() {
     super.initState();
-    // Fetch data immediately when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AdminProvider>(context, listen: false).getKereta();
     });
@@ -23,8 +22,6 @@ class _UniversalCrudViewState extends State<UniversalCrudView> {
   void _showFormDialog({Map<String, dynamic>? item}) {
     final isEdit = item != null;
 
-    // SAFE DATA LOADING:
-    // We check multiple keys to ensure we get the number if it exists
     final initialGerbong =
         item?['jumlah_gerbong'] ?? item?['jumlah_gerbong_aktif'];
 
@@ -34,7 +31,9 @@ class _UniversalCrudViewState extends State<UniversalCrudView> {
     final jmlGerbongCtrl = TextEditingController(
       text: initialGerbong?.toString(),
     );
-    final kuotaCtrl = TextEditingController(text: item?['kuota']?.toString());
+    final kuotaCtrl = TextEditingController(
+      text: item?['kuota']?.toString() ?? '50',
+    );
 
     showDialog(
       context: context,
@@ -90,10 +89,8 @@ class _UniversalCrudViewState extends State<UniversalCrudView> {
                   bool success;
 
                   if (isEdit) {
-                    // Update Logic
-                    // Ensure 'id_kereta' matches your DB ID key exactly
                     success = await provider.updateKereta(
-                      item!['id_kereta'].toString(),
+                      item!['id'].toString(), 
                       namaCtrl.text,
                       deskripsiCtrl.text,
                       kelasCtrl.text,
@@ -115,8 +112,14 @@ class _UniversalCrudViewState extends State<UniversalCrudView> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Berhasil disimpan")),
                     );
-                    // Refresh data to show changes immediately
                     provider.getKereta();
+                  } else if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Gagal menyimpan data"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   }
                 },
                 child: const Text("Simpan"),
@@ -128,7 +131,6 @@ class _UniversalCrudViewState extends State<UniversalCrudView> {
 
   @override
   Widget build(BuildContext context) {
-    // Use Consumer to listen for changes efficiently
     return Consumer<AdminProvider>(
       builder: (context, provider, child) {
         return Scaffold(
@@ -146,13 +148,8 @@ class _UniversalCrudViewState extends State<UniversalCrudView> {
                     itemBuilder: (context, index) {
                       final item = provider.listKereta[index];
 
-                      // DEBUG: Check your console to see exactly what the data is
                       print("DEBUG DATA: $item");
 
-                      // LOGIC FIX:
-                      // 1. Check 'jumlah_gerbong_aktif' FIRST (Priority)
-                      // 2. If that is missing, try 'jumlah_gerbong'
-                      // 3. If both fail, use 0
                       final gerbongCount =
                           item['jumlah_gerbong_aktif'] ??
                           item['jumlah_gerbong'] ??
@@ -164,10 +161,51 @@ class _UniversalCrudViewState extends State<UniversalCrudView> {
                         trailingText: "$gerbongCount Gerbong",
                         onEdit: () => _showFormDialog(item: item),
                         onDelete: () async {
-                          // Ensure 'id_kereta' is the correct key (or try 'id')
-                          await provider.deleteKereta(
-                            item['id_kereta'].toString(),
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder:
+                                (ctx) => AlertDialog(
+                                  title: const Text("Hapus Kereta?"),
+                                  content: const Text(
+                                    "Seluruh data gerbong dan kursi terkait akan ikut terhapus.",
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.pop(ctx, false),
+                                      child: const Text("Batal"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      child: const Text(
+                                        "Hapus",
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                           );
+
+                          if (confirm == true) {
+                            final String idKereta = item['id'].toString();
+
+                            final resultMessage = await provider.deleteKereta(
+                              idKereta,
+                            );
+
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(resultMessage),
+                                  backgroundColor:
+                                      resultMessage.contains("success") ||
+                                              resultMessage.contains("berhasil")
+                                          ? Colors.green
+                                          : Colors.red,
+                                ),
+                              );
+                            }
+                          }
                         },
                       );
                     },

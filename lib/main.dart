@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ukk_percobaan2/views/Pelanggan/home_view.dart';
+import 'package:ukk_percobaan2/providers/admin_report_provider.dart';
+import 'package:ukk_percobaan2/providers/booking_provider.dart';
+import 'package:ukk_percobaan2/providers/history_provider.dart';
 import 'package:ukk_percobaan2/views/Pelanggan/login_view.dart';
 import 'providers/auth_provider.dart';
 import 'providers/admin_provider.dart';
@@ -11,6 +13,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AdminProvider()),
+                ChangeNotifierProvider(create: (_) => BookingProvider()),
+ChangeNotifierProvider(create: (_) => HistoryProvider()), 
+  ChangeNotifierProvider(create: (_) => AdminReportProvider()), 
       ],
       child: const MyApp(),
     ),
@@ -30,9 +35,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
-        scaffoldBackgroundColor: Colors.white, // Background Putih Bersih
+        scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFC2185B), // Warna Utama Pink/Merah
+          seedColor: const Color(0xFFC2185B), 
           brightness: Brightness.light,
         ),
         appBarTheme: const AppBarTheme(
@@ -47,7 +52,6 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      // PAKSA APLIKASI SELALU LIGHT MODE (HIRAUKAN SETTING HP)
       themeMode: ThemeMode.light,
 
       home: const LoginView(),

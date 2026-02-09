@@ -110,23 +110,24 @@ class AdminProvider with ChangeNotifier {
 
   // 4. DELETE KERETA
   Future<String> deleteKereta(String id) async {
-    try {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/kereta.php?id=$id'),
-      );
-      final data = json.decode(response.body);
+  try {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/kereta.php?id=$id'),
+    );
+    final data = json.decode(response.body);
 
-      if (data['status'] == 'success') {
-        _listKereta.removeWhere((item) => item['id'] == id);
-        notifyListeners();
-        return "success";
-      } else {
-        return data['message'];
-      }
-    } catch (e) {
-      return "Terjadi kesalahan koneksi";
+    if (data['status'] == 'success') {
+      // Hapus dari list lokal agar UI langsung update
+      _listKereta.removeWhere((item) => item['id'].toString() == id);
+      notifyListeners();
+      return data['message']; // Mengembalikan "Kereta berhasil dihapus"
+    } else {
+      return data['message']; // Mengembalikan error dari PHP (misal: "Kereta terikat jadwal")
     }
+  } catch (e) {
+    return "Terjadi kesalahan koneksi: $e";
   }
+}
 
   // ===========================================================================
   // BAGIAN 2: MANAJEMEN JADWAL (CRUD)
@@ -197,24 +198,26 @@ class AdminProvider with ChangeNotifier {
     }
   }
 
-  // 4. DELETE JADWAL
-  Future<String> deleteJadwal(String id) async {
-    try {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/jadwal.php?id=$id'),
-      );
-      final data = json.decode(response.body);
+// lib/providers/admin_provider.dart
 
-      if (data['status'] == 'success') {
-        _listJadwal.removeWhere((item) => item['id'] == id);
-        notifyListeners();
-        return "success";
-      }
-      return data['message'];
-    } catch (e) {
-      return "Error Koneksi";
+Future<Map<String, dynamic>> deleteJadwal(String id) async {
+  try {
+    // Sesuaikan nama file dengan yang ada di cPanel (image_d07765.png)
+    final url = Uri.parse("$baseUrl/jadwal.php?id=$id"); 
+    final response = await http.delete(url);
+
+    final data = json.decode(response.body);
+    if (data['status'] == 'success') {
+      await getJadwal(); // Ambil ulang data agar daftar di layar terupdate
+      return {'success': true, 'message': "Jadwal berhasil dihapus"};
+    } else {
+      // Menampilkan pesan error dari PHP (misal: "Sudah ada tiket terbeli")
+      return {'success': false, 'message': data['message']};
     }
+  } catch (e) {
+    return {'success': false, 'message': "Kesalahan koneksi atau server"};
   }
+}
 
   Future<void> getGerbongByKereta(String idKereta) async {
     _isLoading = true;

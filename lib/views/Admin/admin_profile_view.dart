@@ -48,7 +48,6 @@ class AdminProfileView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // NAMA & ROLE
               Text(
                 user?.namaLengkap ?? "Administrator",
                 style: const TextStyle(
@@ -64,7 +63,7 @@ class AdminProfileView extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // TOMBOL LOGOUT (Hanya ini yang tersisa)
+              // TOMBOL LOGOUT
               ListTile(
                 tileColor: Colors.red.withOpacity(0.1),
                 shape: RoundedRectangleBorder(

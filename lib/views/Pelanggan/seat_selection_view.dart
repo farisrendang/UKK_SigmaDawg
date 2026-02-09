@@ -17,10 +17,9 @@ class SeatSelectionView extends StatefulWidget {
 }
 
 class _SeatSelectionViewState extends State<SeatSelectionView> {
-  // Base URL API (Samakan dengan provider)
+  // Base URL API 
   final String baseUrl = "https://micke.my.id/api/ukk";
 
-  // --- STATE LOKAL (PENGGANTI PROVIDER) ---
   bool _isLoading = false;
   List<dynamic> _listGerbong = [];
   List<dynamic> _listKursi = [];
